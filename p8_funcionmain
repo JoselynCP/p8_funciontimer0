@@ -1,0 +1,51 @@
+#include<xc.h>
+void delay_1s(void);	         //Función delay 1s
+void init_ports(void);	     	 //Función inicializar puertos
+#define LED_D1 PORTAbits.RA5     //Define a name to the port (optional)
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void main(void){
+
+ init_ports();					//OSC y puerto
+
+while(1){
+	LED_D1 = LED_D1 ^ 0x01;
+} //from while(1)
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void delay_1s(void){
+        //Count 65472 or 0xFFC0 ticks
+	TMR0H = 0xFF;			//High byte 0xFFC0
+	TMR0L = 0xC0;			//Low bte de 0XFFC0
+	INTCONbits.TMR0IF = 0; 	//Clear the timer overflow flag
+	//Configure the timer
+	T0CON = 0b10001000; // Sin prescala asignada
+	while(INTCONbits.TMR0IF == 0); //Wait for overflow
+	T0CON = 0X00;		           //Stop the timer
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//+ Function that inits the ports used and oscilator
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void init_ports(void){
+    OSCCON = 0b01111110;     //Set the board oscillator to 16Mhz
+    //Output RA5 --> LED
+    TRISAbits.TRISA5 = 0;	//Output
+    ANSELAbits.ANSA5 = 0;   //Digital
+	
+
+}
+
+#pragma config DEBUG=ON				//Debug permitido
+#pragma config FOSC = INTOSCCLKO                //Oscilador interno INTOSCIO
+#pragma config WDTEN = OFF			//Watch dog apagado
+#pragma config LVP = ON			//Low voltage permitido
+#pragma config ICPRT = OFF                      //Debug
+
+
+//#include<delays.h>
+//Delay10KTCYx(40)
+
